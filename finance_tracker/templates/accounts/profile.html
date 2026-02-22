@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Profile & Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left: Account Info -->
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" class="rounded-circle mb-3 mx-auto"
+                style="width:90px;height:90px;object-fit:cover;">
+            {% else %}
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3"
+                style="width:90px;height:90px;font-size:2.2rem;color:white;">
+                {{ user.username|first|upper }}
+            </div>
+            {% endif %}
+            <h5 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h5>
+            <p class="text-muted small">{{ user.email }}</p>
+            <hr>
+            <div class="text-start small text-muted">
+                <div class="mb-1">📅 Joined: {{ user.date_joined|date:"M d, Y" }}</div>
+                <div class="mb-1">💰 Currency: <strong>{{ profile.preferred_currency }}</strong></div>
+                <div>🔔 Budget alerts: <strong>{% if profile.budget_alert_email %}On{% else %}Off{% endif %}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Edit Forms -->
+    <div class="col-md-8">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Account Info -->
+            <div class="card p-4 mb-3">
+                <h6 class="fw-bold mb-3">👤 Account Info</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">First Name</label>
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Last Name</label>
+                        {{ user_form.last_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Username</label>
+                        {{ user_form.username }}
+                        {% if user_form.username.errors %}
+                        <div class="text-danger small">{{ user_form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        {{ user_form.email }}
+                        {% if user_form.email.errors %}
+                        <div class="text-danger small">{{ user_form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preferences -->
+            <div class="card p-4 mb-3">
+                <h6 class="fw-bold mb-3">⚙️ Preferences</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Preferred Currency</label>
+                        {{ profile_form.preferred_currency }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Phone Number</label>
+                        {{ profile_form.phone_number }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Budget Alert Threshold (%)</label>
+                        {{ profile_form.budget_alert_threshold }}
+                        <div class="form-text">Alert when budget usage exceeds this %</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Profile Picture</label>
+                        {{ profile_form.profile_picture }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Bio</label>
+                        {{ profile_form.bio }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            {{ profile_form.budget_alert_email }}
+                            <label class="form-check-label" for="{{ profile_form.budget_alert_email.id_for_label }}">
+                                Receive email alerts when budget is exceeded
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-lg me-1"></i> Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

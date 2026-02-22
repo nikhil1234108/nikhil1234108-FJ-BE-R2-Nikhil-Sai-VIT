@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card p-4 border-danger">
+    <h5 class="text-danger">Delete Budget?</h5>
+    <p>Delete the <strong>{{ budget.category.name }}</strong> budget?</p>
+    <form method="POST" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'budget_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

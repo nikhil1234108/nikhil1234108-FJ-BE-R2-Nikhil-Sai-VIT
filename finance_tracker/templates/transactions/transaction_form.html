@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Transaction{% endblock %}
+{% block page_title %}{{ action }} Transaction{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h5 class="mb-4">
+                <i class="bi bi-{% if action == 'Add' %}plus-circle{% else %}pencil{% endif %} me-2"></i>
+                {{ action }} Transaction
+            </h5>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Type & Category -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Type *</label>
+                        {{ form.type }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Category</label>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="col-md-6 mb-3" id="new-category-wrapper" style="display:none;">
+                        <label class="form-label fw-bold text-primary">
+                            ➕ New Category
+                        </label>
+                        {{ form.new_category }}
+                        <small class="text-muted">
+                            Enter a name if you selected "Other (Add New)"
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Amount / Currency / Date -->
+                <div class="row">
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label fw-bold">Amount *</label>
+                        {{ form.amount }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Currency *</label>
+                        {{ form.currency }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Date *</label>
+                        {{ form.date }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Description *</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Notes</label>
+                    {{ form.notes }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Receipt (optional)</label>
+                    {{ form.receipt }}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_refund }}
+                    <label class="form-check-label" for="id_is_refund">
+                        This is a refund (money returned to me)
+                    </label>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        {{ action }} Transaction
+                    </button>
+                    <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const typeField = document.querySelector('[name="type"]');
+        const categoryField = document.querySelector('[name="category"]');
+        const newCategoryWrapper = document.getElementById("new-category-wrapper");
+
+        function filterCategories() {
+            const selectedType = typeField.value;
+
+            for (let option of categoryField.options) {
+                if (!option.value) continue;
+
+                if (option.text.toLowerCase().includes(selectedType)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            categoryField.value = "";
+        }
+
+        function toggleNewCategory() {
+            if (categoryField.value === "other") {
+                newCategoryWrapper.style.display = "block";
+            } else {
+                newCategoryWrapper.style.display = "none";
+            }
+        }
+
+        filterCategories();
+        toggleNewCategory();
+
+        typeField.addEventListener("change", filterCategories);
+        categoryField.addEventListener("change", toggleNewCategory);
+
+    });
+</script>
+{% endblock %}

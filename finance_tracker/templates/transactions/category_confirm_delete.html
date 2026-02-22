@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card p-4 border-warning">
+    <h5 class="text-warning"><i class="bi bi-exclamation-triangle me-2"></i>Delete Category?</h5>
+    <p>Delete <strong>"{{ category.name }}"</strong>?</p>
+    {% if transaction_count > 0 %}
+    <div class="alert alert-warning">
+        ⚠️ This category has <strong>{{ transaction_count }}</strong> transaction(s).
+        They won't be deleted, but they'll have no category assigned.
+    </div>
+    {% endif %}
+    <form method="POST" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

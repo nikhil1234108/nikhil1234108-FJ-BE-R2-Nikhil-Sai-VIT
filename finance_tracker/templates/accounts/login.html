@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block title %}Login — Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card p-4 mt-5">
+            <h3 class="text-center mb-4">💰 Finance Tracker</h3>
+            <h5 class="text-center text-muted mb-4">Sign in to your account</h5>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    Sign In
+                </button>
+            </form>
+
+            <hr>
+
+            <!-- ✅ Proper Google Login Button -->
+            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-danger w-100 mb-3">
+                <i class="bi bi-google me-2"></i>
+                Sign in with Google
+            </a>
+
+            <p class="text-center mt-3 mb-0">
+                Don't have an account?
+                <a href="{% url 'register' %}">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

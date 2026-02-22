@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Yearly Report{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-calendar3 me-2"></i>Yearly Report — {{ year }}</h4>
+
+<div class="card p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-2">
+            <select name="year" class="form-select">
+                {% for y in years %}<option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">View Year</button>
+        </div>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card p-3 border-success">
+        <div class="text-muted small">Total Income</div>
+        <div class="fs-4 fw-bold text-success">{{ total_income|floatformat:2 }}</div>
+    </div></div>
+    <div class="col-md-4"><div class="card p-3 border-danger">
+        <div class="text-muted small">Total Expenses</div>
+        <div class="fs-4 fw-bold text-danger">{{ total_expense|floatformat:2 }}</div>
+    </div></div>
+    <div class="col-md-4"><div class="card p-3 border-primary">
+        <div class="text-muted small">Net Savings</div>
+        <div class="fs-4 fw-bold text-primary">{{ net_savings|floatformat:2 }}</div>
+    </div></div>
+</div>
+
+<div class="card p-3 mb-4">
+    <h6 class="fw-bold mb-3">Monthly Breakdown — {{ year }}</h6>
+    <canvas id="yearlyChart" height="100"></canvas>
+</div>
+
+<div class="card p-3">
+    <table class="table table-sm">
+        <thead class="table-dark">
+            <tr><th>Month</th><th>Income</th><th>Expenses</th><th>Savings</th></tr>
+        </thead>
+        <tbody>
+            {% for row in monthly_data %}
+            <tr>
+                <td>{{ row.month }}</td>
+                <td class="text-success">{{ row.income|floatformat:2 }}</td>
+                <td class="text-danger">{{ row.expense|floatformat:2 }}</td>
+                <td class="{% if row.savings >= 0 %}text-primary{% else %}text-danger{% endif %}">{{ row.savings|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const data = {{ monthly_chart_data|safe }};
+new Chart(document.getElementById('yearlyChart'), {
+    type: 'bar',
+    data: {
+        labels: data.map(d => d.month),
+        datasets: [
+            { label: 'Income', data: data.map(d => d.income), backgroundColor: 'rgba(40,167,69,0.7)' },
+            { label: 'Expenses', data: data.map(d => d.expense), backgroundColor: 'rgba(220,53,69,0.7)' },
+            { label: 'Savings', data: data.map(d => d.savings), backgroundColor: 'rgba(0,123,255,0.7)', type: 'line' }
+        ]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+});
+</script>
+{% endblock %}

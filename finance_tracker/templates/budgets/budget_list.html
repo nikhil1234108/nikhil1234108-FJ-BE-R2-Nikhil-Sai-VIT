@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4><i class="bi bi-wallet2 me-2"></i>Budgets</h4>
+    <a href="{% url 'budget_create' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>New Budget</a>
+</div>
+<div class="row g-3">
+{% for budget in budgets %}
+<div class="col-md-6">
+    <div class="card p-3 {% if budget.is_exceeded %}border-danger{% elif budget.status == 'warning' %}border-warning{% endif %}">
+        <div class="d-flex justify-content-between">
+            <h6 class="fw-bold">{{ budget.category.icon }} {{ budget.name|default:budget.category.name }}</h6>
+            <div>
+                <a href="{% url 'budget_edit' budget.pk %}" class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'budget_delete' budget.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+        <p class="text-muted small mb-2">{{ budget.start_date }} to {{ budget.end_date }}</p>
+        <div class="d-flex justify-content-between mb-1">
+            <span>Spent: <strong>{{ budget.currency }} {{ budget.spent_amount|floatformat:2 }}</strong></span>
+            <span>Budget: <strong>{{ budget.currency }} {{ budget.amount|floatformat:2 }}</strong></span>
+        </div>
+        <div class="progress mb-1">
+            <div class="progress-bar {% if budget.status == 'exceeded' %}bg-danger{% elif budget.status == 'warning' %}bg-warning{% else %}bg-success{% endif %}"
+                 style="width: {% if budget.usage_percentage > 100 %}100{% else %}{{ budget.usage_percentage|floatformat:0 }}{% endif %}%"></div>
+        </div>
+        <small class="text-muted">{{ budget.usage_percentage|floatformat:1 }}% used</small>
+    </div>
+</div>
+{% empty %}
+<div class="col-12 text-center text-muted py-5">
+    No budgets yet. <a href="{% url 'budget_create' %}">Create your first budget!</a>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

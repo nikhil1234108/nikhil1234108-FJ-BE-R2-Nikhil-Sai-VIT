@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Monthly Report{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-bar-chart me-2"></i>Monthly Report — {{ selected_month_name }}</h4>
+
+<!-- Month Selector -->
+<div class="card p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Month</label>
+            <select name="month" class="form-select">
+                {% for num, name in month_names %}
+                <option value="{{ num }}" {% if num == month %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Year</label>
+            <select name="year" class="form-select">
+                {% for y in years %}
+                <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Generate</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'yearly_report' %}?year={{ year }}" class="btn btn-outline-secondary w-100">Yearly View</a>
+        </div>
+    </form>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 border-success">
+            <div class="text-muted small">Total Income</div>
+            <div class="fs-4 fw-bold text-success">{{ total_income|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 border-danger">
+            <div class="text-muted small">Total Expenses</div>
+            <div class="fs-4 fw-bold text-danger">{{ total_expenses|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 border-primary">
+            <div class="text-muted small">Net Savings</div>
+            <div class="fs-4 fw-bold {% if net_savings >= 0 %}text-primary{% else %}text-danger{% endif %}">
+                {{ net_savings|floatformat:2 }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted small">Savings Rate</div>
+            <div class="fs-4 fw-bold">{{ savings_rate|floatformat:1 }}%</div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Breakdown -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold text-success">Income by Category</h6>
+            {% for item in income_by_cat %}
+            <div class="d-flex justify-content-between py-1 border-bottom">
+                <span>{{ item.category__icon|default:"💰" }} {{ item.category__name|default:"Uncategorized" }}</span>
+                <strong class="text-success">{{ item.total|floatformat:2 }}</strong>
+            </div>
+            {% empty %}<p class="text-muted small">No income this month.</p>{% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="fw-bold text-danger">Expenses by Category</h6>
+            {% for item in expense_by_cat %}
+            <div class="d-flex justify-content-between py-1 border-bottom">
+                <span>{{ item.icon }} {{ item.name }}</span>
+                <strong class="text-danger">{{ item.total|floatformat:2 }}</strong>
+            </div>
+            {% empty %}<p class="text-muted small">No expenses this month.</p>{% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- All Transactions This Month -->
+<div class="card p-3">
+    <h6 class="fw-bold mb-3">All Transactions ({{ selected_month_name }})</h6>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover">
+            <thead class="table-light">
+                <tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th></tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.date }}</td>
+                    <td>{{ t.description }}</td>
+                    <td>{{ t.category|default:"—" }}</td>
+                    <td><span class="badge {% if t.type == 'income' %}bg-success{% else %}bg-danger{% endif %}">{{ t.get_type_display }}</span></td>
+                    <td class="{% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                        {{ t.currency }} {{ t.amount|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">No transactions this month.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

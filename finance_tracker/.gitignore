@@ -1,0 +1,11 @@
+# Never commit these!
+.env
+*.pyc
+__pycache__/
+*.sqlite3
+media/
+staticfiles/
+venv/
+.DS_Store
+node_modules/
+*.log

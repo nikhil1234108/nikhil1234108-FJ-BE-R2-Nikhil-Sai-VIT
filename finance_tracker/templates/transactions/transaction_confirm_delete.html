@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card p-4 border-danger">
+    <h5 class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Delete Transaction?</h5>
+    <p>Are you sure you want to delete:</p>
+    <p><strong>{{ transaction.description }}</strong> — {{ transaction.currency }} {{ transaction.amount }} on {{ transaction.date }}</p>
+    <p class="text-muted small">This action cannot be undone.</p>
+    <form method="POST" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}
